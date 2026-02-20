@@ -33,7 +33,10 @@ router.post('/register', async (req, res) => {
     // Generate token
     const token = generateToken(user._id);
 
-    res.status(201).json({
+    res.status(201).cookie('token', token, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    }).json({
       success: true,
       token,
       user: {
@@ -54,6 +57,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log("Login attempt for email: /login", email,password);
 
     // Find user
     const user = await User.findOne({ email });
