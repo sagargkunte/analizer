@@ -9,6 +9,8 @@ import DailyEntry from './pages/DailyEntry';
 import Analysis from './pages/Analysis';
 import History from './pages/History';
 import Settings from './pages/Settings';
+import About from './pages/About';
+import Crisis from './pages/Crisis';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -100,6 +102,8 @@ function AppContent() {
           <Route path="analysis" element={<Analysis />} />
           <Route path="history" element={<History />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="about" element={<About />} />
+          <Route path="crisis" element={<Crisis />} />
         </Route>
         
         {/* Catch all - redirect to login */}

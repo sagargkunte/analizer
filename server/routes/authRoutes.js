@@ -116,4 +116,192 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// Get user settings
+router.get('/settings', async (req, res) => {
+  try {
+    const userId = req.userId; // Set by authMiddleware
+    const user = await User.findById(userId).select('settings');
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'User not found' 
+      });
+    }
+
+    res.json({
+      success: true,
+      settings: user.settings
+    });
+  } catch (error) {
+    console.error('Get settings error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to retrieve settings' 
+    });
+  }
+});
+
+// Save user settings
+router.post('/settings', async (req, res) => {
+  try {
+    const userId = req.userId; // Set by authMiddleware
+    const settings = req.body; // The entire body is the settings object
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { settings },
+      { new: true, runValidators: true }
+    ).select('settings');
+
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'User not found' 
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Settings saved successfully',
+      settings: user.settings
+    });
+  } catch (error) {
+    console.error('Save settings error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to save settings' 
+    });
+  }
+});
+
+// Get user statistics
+router.get('/stats', async (req, res) => {
+  try {
+    const userId = req.userId; // Set by authMiddleware
+    const user = await User.findById(userId).select('streakDays currentStreak longestStreak daysTracked lastEntryDate');
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'User not found' 
+      });
+    }
+
+    res.json({
+      success: true,
+      stats: {
+        totalEntries: user.daysTracked || 0,
+        currentStreak: user.currentStreak || 0,
+        longestStreak: user.longestStreak || 0,
+        daysTracked: user.daysTracked || 0,
+        lastEntry: user.lastEntryDate
+      }
+    });
+  } catch (error) {
+    console.error('Get stats error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to retrieve statistics' 
+    });
+  }
+});
+
+// Export user data
+router.get('/export-data', async (req, res) => {
+  try {
+    const userId = req.userId; // Set by authMiddleware
+    const user = await User.findById(userId).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'User not found' 
+      });
+    }
+
+    // Also get mood entries if available
+    const MoodEntry = require('../models/MoodEntry');
+    const moodEntries = await MoodEntry.find({ userId });
+
+    const exportData = {
+      user: {
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        settings: user.settings
+      },
+      moodEntries: moodEntries,
+      exportedAt: new Date().toISOString()
+    };
+
+    res.json(exportData);
+  } catch (error) {
+    console.error('Export data error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to export data' 
+    });
+  }
+});
+
+// Reset user data
+router.delete('/data', async (req, res) => {
+  try {
+    const userId = req.userId; // Set by authMiddleware
+
+    // Delete all mood entries for this user
+    const MoodEntry = require('../models/MoodEntry');
+    await MoodEntry.deleteMany({ userId });
+
+    // Reset user stats
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { 
+        daysTracked: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        lastEntryDate: null
+      },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      message: 'All data has been reset successfully'
+    });
+  } catch (error) {
+    console.error('Reset data error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to reset data' 
+    });
+  }
+});
+
+// Delete user account
+router.delete('/account', async (req, res) => {
+  try {
+    const userId = req.userId; // Set by authMiddleware
+
+    // Delete user
+    await User.findByIdAndDelete(userId);
+
+    // Delete all mood entries for this user
+    const MoodEntry = require('../models/MoodEntry');
+    await MoodEntry.deleteMany({ userId });
+
+    res.json({
+      success: true,
+      message: 'Account deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete account error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to delete account' 
+    });
+  }
+});
+
 module.exports = router;
