@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     minlength: 6
   },
   settings: {
+    // Notification Settings
     dailyReminder: {
       type: Boolean,
       default: true
@@ -32,12 +33,101 @@ const userSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     },
+    pushNotifications: {
+      type: Boolean,
+      default: false
+    },
+    
+    // Appearance Settings
     darkMode: {
       type: Boolean,
       default: false
+    },
+    compactView: {
+      type: Boolean,
+      default: false
+    },
+    fontSize: {
+      type: String,
+      enum: ['small', 'medium', 'large', 'xlarge'],
+      default: 'medium'
+    },
+    
+    // Privacy Settings
+    shareAnonymizedData: {
+      type: Boolean,
+      default: false
+    },
+    allowResearch: {
+      type: Boolean,
+      default: false
+    },
+    crisisResources: {
+      type: Boolean,
+      default: true
+    },
+    
+    // Data Settings
+    autoExport: {
+      type: Boolean,
+      default: false
+    },
+    exportFrequency: {
+      type: String,
+      enum: ['never', 'weekly', 'monthly', 'quarterly'],
+      default: 'monthly'
+    },
+    dataRetention: {
+      type: String,
+      enum: ['forever', '1year', '2years', '5years'],
+      default: 'forever'
+    },
+    
+    // Language & Region
+    language: {
+      type: String,
+      default: 'en'
+    },
+    timezone: {
+      type: String,
+      default: 'UTC'
+    },
+    dateFormat: {
+      type: String,
+      default: 'MM/DD/YYYY'
+    },
+    
+    // Dashboard Preferences
+    defaultView: {
+      type: String,
+      default: 'dashboard'
+    },
+    showCharts: {
+      type: Boolean,
+      default: true
+    },
+    showStats: {
+      type: Boolean,
+      default: true
+    },
+    showPatterns: {
+      type: Boolean,
+      default: true
     }
   },
   streakDays: {
+    type: Number,
+    default: 0
+  },
+  currentStreak: {
+    type: Number,
+    default: 0
+  },
+  longestStreak: {
+    type: Number,
+    default: 0
+  },
+  daysTracked: {
     type: Number,
     default: 0
   },
