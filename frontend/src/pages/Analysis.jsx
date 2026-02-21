@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import {
   DocumentTextIcon,
-  LightBulbIcon,
   ShieldCheckIcon,
   ArrowDownTrayIcon,
   PrinterIcon,
@@ -14,7 +13,6 @@ import {
 import MoodChart from '../components/Charts/MoodChart';
 import EnergyChart from '../components/Charts/EnergyChart';
 import SleepChart from '../components/Charts/SleepChart';
-import PatternHighlighter from '../components/Dashboard/PatternHighlighter';
 import { CrisisAlert } from '../components/Alerts/NotificationAlert';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
@@ -59,7 +57,7 @@ const Analysis = () => {
         
         // Highlight pattern if passed from dashboard
         if (location.state?.highlightPattern) {
-          setActiveTab('patterns');
+          setActiveTab('overview');
         }
       }
     } catch (error) {
@@ -120,7 +118,6 @@ const Analysis = () => {
   const tabs = [
     { id: 'overview', name: 'Overview', icon: DocumentTextIcon },
     { id: 'ai-insights', name: 'AI Insights', icon: SparklesIcon },
-    { id: 'patterns', name: 'Patterns', icon: LightBulbIcon },
     { id: 'charts', name: 'Charts', icon: DocumentTextIcon },
     { id: 'recommendations', name: 'Recommendations', icon: ShieldCheckIcon }
   ];
@@ -241,63 +238,6 @@ const Analysis = () => {
               )}
             </div>
 
-            {/* Key Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-3 sm:p-6">
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
-                  Mood Stability
-                </h3>
-                <div className="flex items-end space-x-1 sm:space-x-2">
-                  <span className="text-xl sm:text-3xl font-bold text-purple-600">
-                    {analysis?.analysis?.metrics?.moodStability || 'N/A'}
-                  </span>
-                  <span className="text-xs sm:text-sm text-gray-500 mb-1">/100</span>
-                </div>
-                <div className="mt-2 sm:mt-4 w-full h-1.5 sm:h-2 bg-gray-200 rounded-full">
-                  <div 
-                    className="h-full bg-purple-600 rounded-full"
-                    style={{ width: `${analysis?.analysis?.metrics?.moodStability || 0}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-3 sm:p-6">
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
-                  Sleep Quality
-                </h3>
-                <div className="flex items-end space-x-1 sm:space-x-2">
-                  <span className="text-xl sm:text-3xl font-bold text-blue-600">
-                    {analysis?.analysis?.metrics?.sleepQuality || 'N/A'}
-                  </span>
-                  <span className="text-xs sm:text-sm text-gray-500 mb-1">/100</span>
-                </div>
-                <div className="mt-2 sm:mt-4 w-full h-1.5 sm:h-2 bg-gray-200 rounded-full">
-                  <div 
-                    className="h-full bg-blue-600 rounded-full"
-                    style={{ width: `${analysis?.analysis?.metrics?.sleepQuality || 0}%` }}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-3 sm:p-6">
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">
-                  Energy Consistency
-                </h3>
-                <div className="flex items-end space-x-1 sm:space-x-2">
-                  <span className="text-xl sm:text-3xl font-bold text-green-600">
-                    {analysis?.analysis?.metrics?.energyConsistency || 'N/A'}
-                  </span>
-                  <span className="text-xs sm:text-sm text-gray-500 mb-1">/100</span>
-                </div>
-                <div className="mt-2 sm:mt-4 w-full h-1.5 sm:h-2 bg-gray-200 rounded-full">
-                  <div 
-                    className="h-full bg-green-600 rounded-full"
-                    style={{ width: `${analysis?.analysis?.metrics?.energyConsistency || 0}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
             {/* Charts */}
             <div className="grid grid-cols-1 gap-6">
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6">
@@ -366,31 +306,6 @@ const Analysis = () => {
                 <CpuChipIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400">
                   Not enough data for AI analysis. Continue logging for at least 7 days.
-                </p>
-              </div>
-            )}
-          </motion.div>
-        )}
-
-        {activeTab === 'patterns' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-8"
-          >
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-6">
-              Detected Patterns
-            </h2>
-            {analysis?.analysis?.patterns?.length > 0 ? (
-              <PatternHighlighter patterns={analysis.analysis.patterns} />
-            ) : (
-              <div className="text-center py-8 sm:py-12">
-                <LightBulbIcon className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                  No significant patterns detected in this period.
-                </p>
-                <p className="text-xs sm:text-sm text-gray-500 mt-2">
-                  Continue tracking to identify meaningful patterns.
                 </p>
               </div>
             )}
